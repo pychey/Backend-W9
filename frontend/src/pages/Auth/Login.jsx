@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { setToken } from "../../utils/auth";
+import { useAuth } from "../../context/authContext";
 import API from "../../api";
 
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login, isAuthenticated } = useAuth();
   const autoLoginData = location.state;
 
   const [email, setEmail] = useState(autoLoginData?.email || "");
@@ -14,13 +15,42 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
     if (autoLoginData?.email && autoLoginData?.password) {
-      handleSubmit(); // auto login
+      handleSubmit();
     }
   }, [autoLoginData]);
 
   const handleSubmit = async (e) => {
-    // implement your login logic here
+    if (e) e.preventDefault();
+    
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await API.post("/auth/login", {
+        email,
+        password,
+      });
+
+      if (response.data.token) {
+        login(response.data.token);
+        
+        navigate("/dashboard");
+      } else {
+        setError("Invalid response from server");
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || "Login failed. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,9 +64,9 @@ export default function Login() {
         </h2>
 
         {error && (
-          <p className="text-red-500 text-sm text-center transition-all">
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
             {error}
-          </p>
+          </div>
         )}
 
         <input
@@ -44,7 +74,7 @@ export default function Login() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           required
         />
         <input
@@ -52,20 +82,20 @@ export default function Login() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           required
         />
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="text-sm text-center text-gray-600 mt-2">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link to="/register" className="text-blue-600 hover:underline">
             Register
           </Link>

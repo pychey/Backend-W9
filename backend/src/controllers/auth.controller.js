@@ -21,10 +21,13 @@ import jwt from 'jsonwebtoken';
  *             properties:
  *               name:
  *                 type: string
+ *                 example: name
  *               email:
  *                 type: string
+ *                 example: email@example.com
  *               password:
  *                 type: string
+ *                 example: password
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -67,8 +70,10 @@ export const register = async (req, res) => {
  *             properties:
  *               email:
  *                 type: string
+ *                 example: email@example.com
  *               password:
  *                 type: string
+ *                 example: password
  *     responses:
  *       200:
  *         description: Login successful with token

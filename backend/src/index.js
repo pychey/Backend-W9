@@ -5,12 +5,14 @@ import courseRoutes from './routes/course.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import authRoutes from './routes/auth.route.js';
 import { serveSwagger, setupSwagger } from './config/swagger.js';
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors({ origin: 'http://localhost:5173' }));
 
 app.use('/docs', serveSwagger, setupSwagger);
 
