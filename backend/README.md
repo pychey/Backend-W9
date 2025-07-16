@@ -1,134 +1,53 @@
-# School Management API
+## Q4: Reflective Questions
 
-This is a RESTful API built using **Express.js**, **Sequelize ORM**, and **MySQL** to manage Students, Courses, and Teachers. It includes full CRUD operations, Swagger API documentation, and a Faker-based database seeder.
+### 7. What are the main benefits of using JWT for authentication?
 
----
-
-## 📦 Features
-
-- 🧑‍🎓 CRUD for Students
-- 🧑‍🏫 CRUD for Teachers
-- 📘 CRUD for Courses
-- 🔁 Associations:
-  - One Teacher teaches many Courses
-  - Many Students enroll in many Courses (Many-to-Many)
-- 📚 Swagger documentation (`/api-docs`)
-- 🧪 Faker.js seeder for generating test data
+- **Stateless**: JWT does not require server-side session storage, making it scalable and suitable for microservices or distributed systems.
+- **Compact and portable**: Tokens are small, easy to pass in HTTP headers, and can be used across domains or platforms (e.g., web, mobile).
+- **Self-contained**: JWTs carry all the necessary user information, which can be decoded without accessing a database (though validation is still needed).
+- **Secure**: When signed and optionally encrypted, JWTs protect against tampering and unauthorized access.
 
 ---
 
-## 🚀 Getting Started
+### 8. Where should you store your JWT secret and why?
 
-### 1. Clone the Repo
-
-```bash
-git clone https://github.com/KimangKhenng/school-api.git
-cd school-api
-```
-
-### 2. Install Dependencies
-
-```bash
-npm install
-```
-
-### 3. Configure `.env`
-
-Create a `.env` file in the root:
-
-```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=yourpassword
-DB_NAME=school_db
-DB_PORT=3306
-PORT=3000
-```
-
-### 4. Run the Server
-
-```bash
-npm run dev
-```
-
-Visit: [http://localhost:3000/docs](http://localhost:3000/api-docs)
+- The JWT secret should be stored in **environment variables** (e.g., `.env` file) and **never hard-coded** in the source code.
+- This prevents accidental exposure in version control (like GitHub) and keeps secrets configurable per environment (dev, staging, production).
 
 ---
 
-## 📂 Project Structure
+### 9. Why is it important to hash passwords even if the system is protected with JWT?
 
-```
-.
-├── index.js
-├── config
-│   └── swagger.js
-├── controllers
-│   ├── student.controller.js
-│   ├── teacher.controller.js
-│   └── course.controller.js
-├── models
-│   └── index.js
-├── routes
-│   ├── student.routes.js
-│   ├── teacher.routes.js
-│   └── course.routes.js
-├── seed.js
-└── .env
-```
+- **JWT protects access**, but **hashed passwords protect stored credentials**.
+- If the database is ever breached, hashed passwords prevent attackers from seeing plain-text passwords.
+- Hashing with a strong algorithm like bcrypt ensures passwords are computationally difficult to reverse.
 
 ---
 
-## 🧪 Seeding Fake Data
+### 10. What might happen if a protected route does not check the JWT?
 
-To populate the database with fake students, courses, and teachers using Faker.js:
-
-```bash
-npm run seed
-```
-
-This will:
-- Recreate all tables
-- Insert 5 teachers, 10 courses, and 20 students
-- Enroll students in random courses
+- Any user (even unauthenticated) could access sensitive endpoints.
+- This can lead to **data leaks**, **unauthorized actions**, or full **security breaches**.
+- Authentication is only useful if every protected route **actually enforces** it.
 
 ---
 
-## 📘 API Documentation
+### 11. How does Swagger help frontend developers or API consumers?
 
-Swagger UI is available at:
-
-```
-http://localhost:3000/api-docs
-```
-
-It includes all CRUD endpoints for:
-
-- `/students`
-- `/teachers`
-- `/courses`
+- Provides **interactive documentation** that lists available endpoints, request/response formats, and status codes.
+- Allows developers to **test APIs directly** in the browser without Postman or manual setups.
+- Ensures **clear communication** between backend and frontend teams or third-party consumers.
 
 ---
 
-## ⚙️ Scripts
+### 12. What tradeoffs come with using token expiration (e.g., 1 hour)?
 
-| Script        | Description            |
-|---------------|------------------------|
-| `npm start`   | Start the server       |
-| `node seed.js`| Seed database with Faker.js |
+**Pros:**
+- Limits the time a stolen token can be used.
+- Encourages re-authentication, reducing long-term access risks.
 
----
+**Cons:**
+- May frustrate users if sessions expire too quickly.
+- Requires logic for token renewal (e.g., refresh tokens) to maintain usability.
 
-## 🧑‍💻 Technologies Used
-
-- Express.js
-- Sequelize ORM
-- MySQL
-- Swagger (swagger-jsdoc + swagger-ui-express)
-- Faker.js
-- dotenv
-
----
-
-## 📄 License
-
-MIT
+**Balance:** Short expirations improve security, but should be paired with refresh tokens or automatic renewal to avoid bad UX.
